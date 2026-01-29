@@ -28,6 +28,7 @@ This project applies SQL to query and analyze three years of historical data wit
 ## 2. Data Structure
 
 The database contains **259,527 rows** and **15 columns**, capturing detailed transactional and customer-related information used for analytical purposes.
+
 <img width="945" height="108" alt="image" src="https://github.com/user-attachments/assets/0d53981c-00fe-4c38-8a3d-45d4e31bd2b6" />
 
 
@@ -48,6 +49,7 @@ GROUP BY DATEPART(YEAR,[Thời gian tạo đơn])
 SELECT *,(Revenue - Revenue_Previous) * 100.0 / Revenue_Previous AS Growth_Percentage FROM
 (SELECT *,LAG(Revenue) OVER(ORDER BY Year) AS Revenue_Previous FROM CTE_1) AS Year_1
 ```
+
 <img width="410" height="77" alt="image" src="https://github.com/user-attachments/assets/a1068d78-9b8c-4164-a0c3-7c6bd93beda1" />
 
 
@@ -62,6 +64,7 @@ SELECT DATEPART(YEAR,[Thời gian tạo đơn]) AS Year, SUM([Thành tiền]) AS
 GROUP BY DATEPART(YEAR,[Thời gian tạo đơn])
 ORDER BY YEAR ASC
 ```
+
 <img width="227" height="72" alt="image" src="https://github.com/user-attachments/assets/8e2539ed-47fe-4b98-b790-33f820dd7c96" />
 
 
@@ -76,6 +79,7 @@ GROUP BY DATEPART(YEAR,[Thời gian tạo đơn])
 SELECT *,(AOV - AOV_Previous) * 100.0 / AOV_Previous AS Growth_Percentage FROM 
 (SELECT *,LAG(AOV) OVER(ORDER BY Year) AS AOV_Previous FROM CTE_1) AS Year_1
 ```
+
 <img width="456" height="77" alt="image" src="https://github.com/user-attachments/assets/2e567e22-9bc8-4140-81d6-378dacc82b8a" />
 
 
