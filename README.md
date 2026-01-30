@@ -27,7 +27,7 @@ This project applies SQL to query and analyze three years of historical data wit
 
 ## 2. Data Structure
 
-The database contains **259,527 rows** and **15 columns**, capturing detailed transactional and customer-related information used for analytical purposes.
+The database contains **259,527 rows** and **13 columns**, capturing detailed transactional and customer-related information used for analytical purposes.
 
 <img width="945" height="108" alt="image" src="https://github.com/user-attachments/assets/0d53981c-00fe-4c38-8a3d-45d4e31bd2b6" />
 
