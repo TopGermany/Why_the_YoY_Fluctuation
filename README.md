@@ -523,5 +523,5 @@ Revenue decline in 2024 is primarily driven by declining AOV, loss of loyal cust
 - Learned to identify **revenue trends and root causes of decline**, while ensuring data accuracy through validation checks.
 - Developed the ability to turn **data analysis into actionable business insights**, with a focus on **AOV and sustainable growth**.
 
-## PROJECT - TOPGERMANY
+																																									## PROJECT - TOPGERMANY
 
