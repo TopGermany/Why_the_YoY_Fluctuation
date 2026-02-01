@@ -90,6 +90,34 @@ This suggests potential factors such as increased discounting, a shift toward pr
 ## Monthly Revenue Performance
 
 ## Growth Phase: 2022 – 2023
+```sql 
+WITH CTE_2022 AS (
+SELECT DATEPART(YEAR,[Thời gian tạo đơn]) AS Year, DATEPART(MONTH,[Thời gian tạo đơn]) AS Month,SUM([Thành tiền]) AS Revenue,SUM([Thành tiền])/COUNT(DISTINCT([Mã đơn hàng])) AS AOV,
+SUM(SL) AS Quantity FROM Sales
+WHERE DATEPART(YEAR,[Thời gian tạo đơn]) = 2022
+GROUP BY DATEPART(YEAR,[Thời gian tạo đơn]), DATEPART(MONTH,[Thời gian tạo đơn])
+),
+CTE_2023 AS (
+SELECT DATEPART(YEAR,[Thời gian tạo đơn]) AS Year, DATEPART(MONTH,[Thời gian tạo đơn]) AS Month,SUM([Thành tiền]) AS Revenue,SUM([Thành tiền])/COUNT(DISTINCT([Mã đơn hàng])) AS AOV,
+SUM(SL) AS Quantity FROM Sales
+WHERE DATEPART(YEAR,[Thời gian tạo đơn]) = 2023
+GROUP BY DATEPART(YEAR,[Thời gian tạo đơn]), DATEPART(MONTH,[Thời gian tạo đơn])
+),
+CTE_2024 AS (
+SELECT DATEPART(YEAR,[Thời gian tạo đơn]) AS Year, DATEPART(MONTH,[Thời gian tạo đơn]) AS Month,SUM([Thành tiền]) AS Revenue,SUM([Thành tiền])/COUNT(DISTINCT([Mã đơn hàng])) AS AOV,
+SUM(SL) AS Quantity FROM Sales
+WHERE DATEPART(YEAR,[Thời gian tạo đơn]) = 2024
+GROUP BY DATEPART(YEAR,[Thời gian tạo đơn]), DATEPART(MONTH,[Thời gian tạo đơn])
+)
+SELECT *,(A2023.Revenue - A2022.Revenue) AS Revenue_Growth_2022_2023,(A2024.Revenue - A2023.Revenue) AS Revenue_Growth_2023_2024 FROM CTE_2022 AS A2022
+	INNER JOIN CTE_2023 AS A2023
+ON A2022.Month = A2023.Month
+	INNER JOIN CTE_2024 AS A2024
+ON A2023.Month = A2024.Month
+ORDER BY A2022.Year, A2022.Month ASC;
+```
+<img width="1470" height="258" alt="image" src="https://github.com/user-attachments/assets/fe5b3b71-35ce-4a29-9435-3d98886fd452" />
+
 
 - Most months in **2023** recorded **higher revenue compared to 2022**, indicating a strong growth trend for the business.  
 Significant growth was observed in **January, February, and March**, demonstrating positive momentum at the beginning of the year.
