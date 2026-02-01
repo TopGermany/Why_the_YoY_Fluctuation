@@ -146,22 +146,241 @@ Significant growth was observed in **January, February, and March**, demonstrati
 ---
 
 ## Quarterly Revenue Performance
+```sql
+WITH CTE_2022 AS (
+SELECT DATEPART(YEAR,[Thời gian tạo đơn]) AS Year, DATEPART(QUARTER,[Thời gian tạo đơn]) AS Quater,SUM([Thành tiền]) AS Revenue,SUM(SL) AS Quantity FROM Sales
+WHERE DATEPART(YEAR,[Thời gian tạo đơn]) = 2022
+GROUP BY DATEPART(YEAR,[Thời gian tạo đơn]), DATEPART(QUARTER,[Thời gian tạo đơn])
+),
+CTE_2023 AS (
+SELECT DATEPART(YEAR,[Thời gian tạo đơn]) AS Year, DATEPART(QUARTER,[Thời gian tạo đơn]) AS Quater,SUM([Thành tiền]) AS Revenue,SUM(SL) AS Quantity FROM Sales
+WHERE DATEPART(YEAR,[Thời gian tạo đơn]) = 2023
+GROUP BY DATEPART(YEAR,[Thời gian tạo đơn]), DATEPART(QUARTER,[Thời gian tạo đơn])
+),
+CTE_2024 AS (
+SELECT DATEPART(YEAR,[Thời gian tạo đơn]) AS Year, DATEPART(QUARTER,[Thời gian tạo đơn]) AS Quater,SUM([Thành tiền]) AS Revenue,SUM(SL) AS Quantity FROM Sales
+WHERE DATEPART(YEAR,[Thời gian tạo đơn]) = 2024
+GROUP BY DATEPART(YEAR,[Thời gian tạo đơn]), DATEPART(QUARTER,[Thời gian tạo đơn])
+)
+SELECT *,(A2023.Revenue - A2022.Revenue) AS Revenue_Growth_2022_2023,(A2024.Revenue - A2023.Revenue) AS Revenue_Growth_2023_2024 FROM CTE_2022 AS A2022
+	INNER JOIN CTE_2023 AS A2023
+ON A2022.Quater = A2023.Quater
+	INNER JOIN CTE_2024 AS A2024
+ON A2023.Quater = A2024.Quater
+ORDER BY A2022.Year, A2022.Quater ASC;
 
-### 2022 to 2023
-- All quarters in 2023 recorded revenue growth compared to 2022.
-- Q4 2023 achieved the highest revenue, confirming the importance of year-end seasonality.
-- Balanced growth across quarters indicates stable operational performance throughout the year.
+```
+<img width="1125" height="102" alt="image" src="https://github.com/user-attachments/assets/c45616dc-c2a4-4067-80a0-ca8006a1123f" />
 
-### 2023 to 2024
-- All four quarters in 2024 experienced revenue declines compared to 2023.
-- Q1 and Q4 showed the most severe drops.
-- The consistent decline across all quarters suggests a long-term downward trend rather than short-term volatility.
+
+### Q4 as the Traditional Peak Season
+In **2022**, **Q4 was the strongest quarter**, generating the highest revenue (over **1.9 billion**), confirming its role as the traditional peak season.
+
+However, in both **2023 and 2024**, the dominance of Q4 **was not sustained**. The weakening performance in this critical quarter suggests that:
+- Market demand during year-end periods has softened, or
+- The business has become less effective in capitalizing on peak-season opportunities.
+
+This shift highlights a **decline in end-of-year sales effectiveness**, which has a significant impact on overall annual performance.
+
+---
+
+### Relationship Between Revenue and Sales Volume
+Revenue trends closely mirror changes in **sales quantity**, indicating a strong positive correlation between the two.
+
+This suggests that:
+- **Average selling prices remained relatively stable**
+- Revenue decline was driven primarily by **lower sales volume**, rather than aggressive price reductions or discounting strategies
+
+In other words, the core issue lies in **reduced purchasing activity**, not pricing erosion.
+
+---
+
+## Key Takeaway
+The business is facing a **demand-driven revenue decline**, compounded by an inability to fully leverage seasonal peaks—particularly in Q4. Without intervention, this pattern poses a significant risk to long-term revenue sustainability.
 
 ---
 
 ## Revenue Decline Analysis – Customer & Order Value Perspective
 
 ### Customer Structure Analysis (RFM Segmentation)
+```SQL
+WITH RFM_Martrics2022 AS (
+	SELECT [Mã khách hàng],MAX([Thời gian tạo đơn]) AS Last_active_Day, DATEDIFF(DAY,MAX([Thời gian tạo đơn]),'2022-12-31') AS Recency,
+	COUNT(DISTINCT([Mã đơn hàng])) AS Frequency, SUM([Thành tiền]) AS Monetary 
+	FROM Sales
+	WHERE DATEPART(YEAR,[Thời gian tạo đơn]) = 2022
+	GROUP BY [Mã khách hàng]
+),
+RFM_Group2022 AS (
+	SELECT *, 
+	NTILE(4) OVER (ORDER BY Recency ASC) AS R_Group, 
+	NTILE(4) OVER (ORDER BY Frequency DESC) AS F_Group,
+	NTILE(4) OVER (ORDER BY Monetary DESC) AS M_Group
+	FROM RFM_Martrics2022
+),
+RFM_Rank2022 AS (
+	SELECT 
+	[Mã khách hàng],Recency, Frequency,Monetary,
+	Case
+		WHEN R_Group = 1 THEN 4
+		WHEN R_Group = 2 THEN 3
+		WHEN R_Group = 3 THEN 2
+		WHEN R_Group = 4 THEN 1
+	END AS R_Rank
+	,
+	CASE 
+		WHEN F_Group = 1 THEN 4
+		WHEN F_Group = 2 THEN 3
+		WHEN F_Group = 3 THEN 2
+		WHEN F_Group = 4 THEN 1
+	END AS F_Rank
+	,
+	CASE
+		WHEN M_Group = 1 THEN 4
+		WHEN M_Group = 2 THEN 3
+		WHEN M_Group = 3 THEN 2
+		WHEN M_Group = 4 THEN 1
+	END AS M_Rank
+	FROM RFM_Group2022
+),
+Name_Segment_2022 AS (
+	SELECT *, CONCAT(R_Rank,F_Rank,M_Rank) AS PKKH, 
+		CASE 
+				WHEN R_Rank = 4 AND F_Rank = 4 AND M_Rank = 4 THEN N'VIP'
+				WHEN R_Rank >= 3 AND F_Rank >= 3 AND M_Rank >= 3 THEN N'Loyal Customers'
+				WHEN R_Rank >= 3 AND F_Rank >= 2 THEN N'Potential Loyalist'
+				WHEN R_Rank <= 2 AND F_Rank >= 3 THEN N'At Risk'
+				WHEN R_Rank = 1 AND F_Rank = 1 THEN N'Lost Customers'
+				ELSE N'Regular'
+			END AS customer_segment
+	FROM RFM_Rank2022
+),
+Segment_2022 AS (
+	SELECT customer_segment,COUNT(*) AS Total_SegmentCustomer2022 
+	FROM Name_Segment_2022
+	GROUP BY customer_segment
+),
+RFM_Martrics2023 AS (
+	SELECT [Mã khách hàng],MAX([Thời gian tạo đơn]) AS Last_active_Day, DATEDIFF(DAY,MAX([Thời gian tạo đơn]),'2023-12-31') AS Recency,
+	COUNT(DISTINCT([Mã đơn hàng])) AS Frequency, SUM([Thành tiền]) AS Monetary 
+	FROM Sales
+	WHERE DATEPART(YEAR,[Thời gian tạo đơn]) = 2023
+	GROUP BY [Mã khách hàng]
+),
+RFM_Group2023 AS (
+	SELECT *, 
+	NTILE(4) OVER (ORDER BY Recency ASC) AS R_Group, 
+	NTILE(4) OVER (ORDER BY Frequency DESC) AS F_Group,
+	NTILE(4) OVER (ORDER BY Monetary DESC) AS M_Group
+	FROM RFM_Martrics2023
+),
+RFM_Rank2023 AS (
+	SELECT 
+	[Mã khách hàng],Recency, Frequency,Monetary,
+	Case
+		WHEN R_Group = 1 THEN 4
+		WHEN R_Group = 2 THEN 3
+		WHEN R_Group = 3 THEN 2
+		WHEN R_Group = 4 THEN 1
+	END AS R_Rank
+	,
+	CASE 
+		WHEN F_Group = 1 THEN 4
+		WHEN F_Group = 2 THEN 3
+		WHEN F_Group = 3 THEN 2
+		WHEN F_Group = 4 THEN 1
+	END AS F_Rank
+	,
+	CASE
+		WHEN M_Group = 1 THEN 4
+		WHEN M_Group = 2 THEN 3
+		WHEN M_Group = 3 THEN 2
+		WHEN M_Group = 4 THEN 1
+	END AS M_Rank
+	FROM RFM_Group2023
+),
+Name_Segment_2023 AS (
+	SELECT *, CONCAT(R_Rank,F_Rank,M_Rank) AS PKKH, 
+		CASE 
+				WHEN R_Rank = 4 AND F_Rank = 4 AND M_Rank = 4 THEN N'VIP'
+				WHEN R_Rank >= 3 AND F_Rank >= 3 AND M_Rank >= 3 THEN N'Loyal Customers'
+				WHEN R_Rank >= 3 AND F_Rank >= 2 THEN N'Potential Loyalist'
+				WHEN R_Rank <= 2 AND F_Rank >= 3 THEN N'At Risk'
+				WHEN R_Rank = 1 AND F_Rank = 1 THEN N'Lost Customers'
+				ELSE N'Regular'
+			END AS customer_segment
+	FROM RFM_Rank2023
+),
+Segment_2023 AS (
+	SELECT customer_segment,COUNT(*) AS Total_SegmentCustomer2023 
+	FROM Name_Segment_2023
+	GROUP BY customer_segment
+),
+RFM_Martrics2024 AS (
+	SELECT [Mã khách hàng],MAX([Thời gian tạo đơn]) AS Last_active_Day, DATEDIFF(DAY,MAX([Thời gian tạo đơn]),'2024-12-31') AS Recency,
+	COUNT(DISTINCT([Mã đơn hàng])) AS Frequency, SUM([Thành tiền]) AS Monetary 
+	FROM Sales
+	WHERE DATEPART(YEAR,[Thời gian tạo đơn]) = 2024
+	GROUP BY [Mã khách hàng]
+),
+RFM_Group2024 AS (
+	SELECT *, 
+	NTILE(4) OVER (ORDER BY Recency ASC) AS R_Group, 
+	NTILE(4) OVER (ORDER BY Frequency DESC) AS F_Group,
+	NTILE(4) OVER (ORDER BY Monetary DESC) AS M_Group
+	FROM RFM_Martrics2024
+),
+RFM_Rank2024 AS (
+	SELECT 
+	[Mã khách hàng],Recency, Frequency,Monetary,
+	Case
+		WHEN R_Group = 1 THEN 4
+		WHEN R_Group = 2 THEN 3
+		WHEN R_Group = 3 THEN 2
+		WHEN R_Group = 4 THEN 1
+	END AS R_Rank
+	,
+	CASE 
+		WHEN F_Group = 1 THEN 4
+		WHEN F_Group = 2 THEN 3
+		WHEN F_Group = 3 THEN 2
+		WHEN F_Group = 4 THEN 1
+	END AS F_Rank
+	,
+	CASE
+		WHEN M_Group = 1 THEN 4
+		WHEN M_Group = 2 THEN 3
+		WHEN M_Group = 3 THEN 2
+		WHEN M_Group = 4 THEN 1
+	END AS M_Rank
+	FROM RFM_Group2024
+),
+Name_Segment_2024 AS (
+	SELECT *, CONCAT(R_Rank,F_Rank,M_Rank) AS PKKH, 
+		CASE 
+				WHEN R_Rank = 4 AND F_Rank = 4 AND M_Rank = 4 THEN N'VIP'
+				WHEN R_Rank >= 3 AND F_Rank >= 3 AND M_Rank >= 3 THEN N'Loyal Customers'
+				WHEN R_Rank >= 3 AND F_Rank >= 2 THEN N'Potential Loyalist'
+				WHEN R_Rank <= 2 AND F_Rank >= 3 THEN N'At Risk'
+				WHEN R_Rank = 1 AND F_Rank = 1 THEN N'Lost Customers'
+				ELSE N'Regular'
+			END AS customer_segment
+	FROM RFM_Rank2024
+),
+Segment_2024 AS (
+	SELECT customer_segment,COUNT(*) AS Total_SegmentCustomer2024 
+	FROM Name_Segment_2024
+	GROUP BY customer_segment
+)
+SELECT * FROM Segment_2022 AS S2
+	INNER JOIN Segment_2023 AS S3
+ON S2.customer_segment = S3.customer_segment
+	INNER JOIN Segment_2024 AS S4
+ON S4.customer_segment = S3.customer_segment
+ORDER BY S2.customer_segment DESC
+```
+<img width="950" height="142" alt="image" src="https://github.com/user-attachments/assets/bcd5760d-9baf-4ee5-9a7b-bf764246b31b" />
+
 
 RFM analysis reveals significant shifts in customer quality and behavior, particularly in 2024:
 
@@ -180,6 +399,9 @@ RFM analysis reveals significant shifts in customer quality and behavior, partic
 Overall, revenue decline is driven not only by lower sales volume but primarily by deterioration in customer quality, especially the loss of loyal and VIP customers.
 
 ### Continuous AOV Decline
+
+<img width="457" height="77" alt="image" src="https://github.com/user-attachments/assets/8c2799b3-dfe3-4299-b0d2-a15aba107344" />
+
 - AOV decreased consistently:
   - Approximately 10% from 2022 to 2023
   - Approximately 11% from 2023 to 2024
@@ -208,6 +430,15 @@ The revenue decline in 2024 is not merely a seasonal or short-term market issue.
 ## Business Strategy & Data-Driven Recommendations
 
 ### Product & Cross-Selling Strategy (Market Basket Analysis)
+```SQL
+SELECT TOP 10 A.[Tên mặt hàng],B.[Tên mặt hàng],COUNT(*) AS Frequency FROM 
+Sales AS A JOIN Sales AS B ON A.[Mã đơn hàng] = B.[Mã đơn hàng] AND A.[Mã mặt hàng] < B.[Mã mặt hàng]
+GROUP BY A.[Tên mặt hàng],B.[Tên mặt hàng]
+ORDER BY COUNT(*) DESC;
+```
+
+<img width="326" height="215" alt="image" src="https://github.com/user-attachments/assets/b548320c-054b-4bf8-a70f-2b2fd03baaa8" />
+
 
 Market basket analysis identifies frequently co-purchased product pairs such as:
 - Celery powder and ginger tea
@@ -220,12 +451,45 @@ These patterns reflect health-oriented combo purchasing behavior.
 Recommended actions include creating fixed product bundles, applying bundle pricing, and implementing cross-sell suggestions at checkout or POS systems. Priority should be given to Regular, Potential Loyalist, and At-Risk customer segments to increase AOV and stimulate repeat purchases.
 
 ### Seasonal & Monthly AOV Strategy
+```SQL
+SELECT CONCAT('Tháng ',MONTH([Thời gian tạo đơn])) AS Month, SUM([Thành tiền])/COUNT(distinct[Mã đơn hàng]) AS AOV FROM Sales
+GROUP BY MONTH([Thời gian tạo đơn]) 
+ORDER BY AOV DESC;
+
+```
+
+<img width="227" height="260" alt="image" src="https://github.com/user-attachments/assets/57215bcb-bdf4-4ad5-8539-f80deaf2c0ad" />
+
 
 Higher AOV is concentrated in June, July, August, and November, while lower AOV occurs in February, March, and April.
 
 During high-AOV months, businesses should push premium upselling and limited-edition products. During low-AOV months, promotional bundles, vouchers, and volume-based discounts can help stabilize revenue and cash flow.
 
 ### Operational & Staffing Strategy by Time Slot
+```SQL
+SELECT 
+    CASE 
+        WHEN DATEPART(HOUR, [Thời gian tạo đơn]) >= 8 AND DATEPART(HOUR, [Thời gian tạo đơn]) < 13 THEN N'Ca Sáng (8h-13h)'
+        WHEN DATEPART(HOUR, [Thời gian tạo đơn]) >= 13 AND DATEPART(HOUR, [Thời gian tạo đơn]) < 18 THEN N'Ca Chiều (13h-18h)'
+        WHEN DATEPART(HOUR, [Thời gian tạo đơn]) >= 18 AND DATEPART(HOUR, [Thời gian tạo đơn]) < 23 THEN N'Ca Tối (18h-23h)'
+        ELSE N'Ngoài giờ hành chính'
+    END AS [Ca Làm Việc],
+    COUNT(DISTINCT [Mã đơn hàng]) AS [Số Đơn Hàng],
+    SUM([Thành tiền]) AS [Tổng Doanh Thu],
+    SUM([Thành tiền]) / COUNT(DISTINCT [Mã đơn hàng]) AS AOV
+FROM Sales
+GROUP BY 
+    CASE 
+        WHEN DATEPART(HOUR, [Thời gian tạo đơn]) >= 8 AND DATEPART(HOUR, [Thời gian tạo đơn]) < 13 THEN N'Ca Sáng (8h-13h)'
+        WHEN DATEPART(HOUR, [Thời gian tạo đơn]) >= 13 AND DATEPART(HOUR, [Thời gian tạo đơn]) < 18 THEN N'Ca Chiều (13h-18h)'
+        WHEN DATEPART(HOUR, [Thời gian tạo đơn]) >= 18 AND DATEPART(HOUR, [Thời gian tạo đơn]) < 23 THEN N'Ca Tối (18h-23h)'
+        ELSE N'Ngoài giờ hành chính'
+    END
+ORDER BY AOV DESC;
+```
+
+<img width="492" height="98" alt="image" src="https://github.com/user-attachments/assets/7f5422b6-289f-47cb-b1fe-c197804f77fc" />
+
 
 Evening shifts (18:00–23:00) generate the highest order volume and total revenue. Morning and afternoon shifts show stable performance with relatively high AOV, while off-peak hours contribute minimally.
 
