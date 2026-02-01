@@ -89,21 +89,31 @@ This suggests potential factors such as increased discounting, a shift toward pr
 
 ## Monthly Revenue Performance
 
-### 2022 to 2023 Growth Phase
-- Most months in 2023 recorded higher revenue compared to 2022.
-- Strong growth was observed in January, February, and March, indicating positive momentum at the beginning of the year.
-- Revenue peaks in August, October, and December reflect seasonality and year-end demand.
-- Revenue growth was accompanied by higher sales volume, suggesting scale-driven expansion.
+## Growth Phase: 2022 – 2023
 
-Overall, 2023 represents a period of comprehensive growth supported by favorable market conditions and effective sales strategies.
+- Most months in **2023** recorded **higher revenue compared to 2022**, indicating a strong growth trend for the business.  
+Significant growth was observed in **January, February, and March**, demonstrating positive momentum at the beginning of the year.
 
-### 2023 to 2024 Decline Phase
-- The majority of months in 2024 showed revenue declines compared to 2023.
-- Significant drops occurred in January, February, and March, indicating an early loss of growth momentum.
-- Mid-year months (April to July) continued to weaken, suggesting a prolonged downturn rather than a temporary fluctuation.
-- Although some months showed relative stability, the recovery was insufficient to offset the overall decline.
+- Revenue peaked in **August, October, and December**, reflecting clear **seasonality effects** and increased demand during year-end peak periods.
 
-This pattern points to structural challenges, potentially driven by reduced market demand, increased competition, or misaligned pricing and product strategies.
+- However, when analyzing **Average Order Value (AOV)**, it becomes evident that **AOV did not grow proportionally with revenue**, and even declined slightly in several months. This indicates that revenue growth during this period was **primarily driven by higher sales volume**, rather than increased value per transaction.
+
+- Overall, **2023 represents a scale-driven growth phase**, supported by favorable market conditions and effective sales execution, but **lacks long-term sustainability due to the absence of AOV improvement**.
+
+---
+
+## Decline Phase: 2023 – 2024
+
+- Most months in **2024** experienced **a decline in revenue compared to 2023**, marking a clear reversal in the growth trajectory.
+
+- Significant drops occurred as early as **January, February, and March**, indicating that growth momentum was **not sustained**. At the same time, **AOV declined during these early months**, suggesting that customers were **spending less per order**.
+
+- The mid-year period (**April to July**) continued to show **prolonged weakness**, with both **revenue and AOV remaining at low levels**. This pattern suggests that the decline is **structural rather than a short-term seasonal fluctuation**.
+
+- Although some months showed relative stabilization, **AOV failed to recover meaningfully**, preventing revenue from offsetting the decline in order volume.
+
+- Overall, this trend highlights **fundamental challenges** faced by the business, potentially driven by **weaker market demand, increased competition, or misaligned pricing and product strategies**, resulting in a simultaneous decline in both **order quantity and order value**.
+
 
 ---
 
