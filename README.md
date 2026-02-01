@@ -513,3 +513,15 @@ The primary objective is to increase Customer Lifetime Value rather than focusin
 ## Strategic Summary
 
 Revenue decline in 2024 is primarily driven by declining AOV, loss of loyal customers, and underutilized cross-selling and timing strategies. Integrating Market Basket Analysis, Time-Based Analysis, and RFM Segmentation enables a data-driven growth strategy focused on improving order quality and long-term customer value.
+
+---
+
+## Lessons Learned from the Project
+
+- Applied **SQL** to analyze business performance through aggregations, time-based metrics, and revenue tracking.
+- Gained hands-on experience with **RFM segmentation** and **Market Basket Analysis** to support customer and product strategies.
+- Learned to identify **revenue trends and root causes of decline**, while ensuring data accuracy through validation checks.
+- Developed the ability to turn **data analysis into actionable business insights**, with a focus on **AOV and sustainable growth**.
+
+## PROJECT - TOPGERMANY
+
